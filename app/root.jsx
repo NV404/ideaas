@@ -7,6 +7,7 @@ const {
   ScrollRestoration,
 } = require("@remix-run/react");
 import styles from "./styles/app.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -41,6 +42,7 @@ export default function App() {
         <div className="w-[min(1080px,_100%)] h-full mx-auto pb-6 px-5">
           <Outlet />
         </div>
+        <Analytics />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
