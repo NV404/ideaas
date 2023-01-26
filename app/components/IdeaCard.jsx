@@ -4,9 +4,9 @@ export default function IdeaCard({ idea }) {
   return (
     <Link
       to={`/i/${idea.id}`}
-      className="flex items-center gap-4 bg-white rounded-2xl w-full max-w-2xl p-4 cursor-pointer hover:bg-white/60"
+      className="flex items-center gap-4 bg-white rounded-2xl w-full p-4 cursor-pointer hover:bg-white/60"
     >
-      <div className="flex flex-col justify-center items-center border-r-2 pr-4 border-black/30 hover:text-blue-500">
+      <div className="flex flex-col justify-center items-center border-r-2 pr-4 border-black/30">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="30"

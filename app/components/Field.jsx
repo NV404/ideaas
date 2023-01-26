@@ -5,11 +5,15 @@ export default function Field({
   className = "",
   disabled = false,
   postfixText = null,
+  widthFull = false,
   ...otherProps
 }) {
   return (
     <fieldset
-      className="w-full flex flex-col items-stretch justify-start gap-1 disabled:opacity-60 disabled:cursor-not-allowed"
+      className={[
+        "flex flex-col items-stretch justify-start gap-1 disabled:opacity-60 disabled:cursor-not-allowed",
+        widthFull ? "w-full" : "",
+      ].join(" ")}
       disabled={disabled}
     >
       {label ? (

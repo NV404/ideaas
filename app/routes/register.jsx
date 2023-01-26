@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react";
+import { Form, Link, useActionData, useTransition } from "@remix-run/react";
 import { db } from "utils/db.server";
 import { createUserSession, getUserId, register } from "utils/session.server";
 import Button from "~/components/Button";
@@ -48,6 +48,7 @@ export async function action({ request }) {
 }
 
 export default function Register() {
+  const transition = useTransition();
   const data = useActionData();
 
   return (
@@ -80,6 +81,7 @@ export default function Register() {
             Register
           </h1>
           <Field
+            widthFull={true}
             type="email"
             name="email"
             id="email"
@@ -88,6 +90,7 @@ export default function Register() {
             required
           />
           <Field
+            widthFull={true}
             type="text"
             name="name"
             id="name"
@@ -96,6 +99,7 @@ export default function Register() {
             required
           />
           <Field
+            widthFull={true}
             type="password"
             name="password"
             id="password"
@@ -104,6 +108,7 @@ export default function Register() {
             required
           />
           <Field
+            widthFull={true}
             type="password"
             name="re-pass"
             id="re-pass"
@@ -114,7 +119,14 @@ export default function Register() {
           {data?.error && (
             <p className="text-red-600 font-medium">{data?.error}</p>
           )}
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              transition.state === "loading" ||
+              transition.state === "submitting"
+            }
+          >
             Register
           </Button>
           <Link to="/login" className="hover:underline">

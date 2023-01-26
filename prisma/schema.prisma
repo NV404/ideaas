@@ -17,12 +17,14 @@ model User {
 
   email        String @unique
   name         String
+  about        String @default("🤔 Thinking about a cool bio...")
   passwordHash String
 
   ideas            Idea[]
   liked_ideas      Idea_like[]
   idea_discussions Idea_discussion[]
   discussion_like  Discussion_like[]
+  subDiscussion    Sub_discussion[]
 }
 
 model Idea {
@@ -63,12 +65,26 @@ model Idea_discussion {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  likes Discussion_like[]
+  likes         Discussion_like[]
+  subDiscussion Sub_discussion[]
 }
 
 model Discussion_like {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+
+  discussionId String
+  discussion   Idea_discussion @relation(fields: [discussionId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Sub_discussion {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  content String
 
   discussionId String
   discussion   Idea_discussion @relation(fields: [discussionId], references: [id])

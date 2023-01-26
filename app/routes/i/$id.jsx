@@ -1,6 +1,13 @@
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useNavigate,
+  useTransition,
+} from "@remix-run/react";
 import {
   addDiscussion,
+  addSubDiscussion,
   dislikeDiscussionIdea,
   dislikeIdea,
   getIdeaById,
@@ -68,6 +75,14 @@ export async function action({ request }) {
       }
       return { data: "success" };
     }
+
+    if (action === "sub_discussion") {
+      const discuss = await addSubDiscussion({ id, discussion, request });
+      if (!discuss) {
+        return { error: "something went wrong while posting discussion" };
+      }
+      return { data: "success" };
+    }
   }
 
   return { error: "Action not found" };
@@ -75,6 +90,9 @@ export async function action({ request }) {
 
 export default function Idea() {
   const { user, idea } = useLoaderData();
+  const transition = useTransition();
+  const navigate = useNavigate();
+  const goBack = () => navigate(-1);
 
   function isLiked(id) {
     const obj = idea.likes.find((x) => x.userId === id);
@@ -87,14 +105,14 @@ export default function Idea() {
   return (
     <div className="flex gap-8 flex-col">
       <Nav user={user} />
-      <Button as={Link} to="/" theme="plain" className="w-fit">
-        ← Home
+      <Button onClick={goBack} theme="plain" className="w-fit">
+        ← Back
       </Button>
 
       <h1 className="font-display font-semibold text-3xl sm:text-4xl md:text-5xl leading-tight">
         {idea.title}
       </h1>
-      <Form method="post">
+      <Form method="post" replace>
         <input type="hidden" name="id" value={idea?.id} />
         <input
           type="hidden"
@@ -102,6 +120,9 @@ export default function Idea() {
           value={isLiked(user?.id) ? "dislike" : "like"}
         />
         <Button
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
           as={!user ? Link : "button"}
           to="/login"
           theme="none"
@@ -139,8 +160,11 @@ export default function Idea() {
       <h1 className="font-display font-semibold text-3xl sm:text-2xl md:text-3xl leading-tight max-w-2xl">
         Discussions
       </h1>
-      <Form method="post" className="flex flex-col gap-2">
+      <Form method="post" className="flex flex-col gap-2" replace>
         <Field
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
           as="textarea"
           name="discussion"
           id="discussion"
@@ -150,7 +174,14 @@ export default function Idea() {
         />
         <input type="hidden" name="id" value={idea.id} />
         <input type="hidden" name="action" value="discussion" />
-        <Button as={!user ? Link : "button"} to="/login" className="w-fit">
+        <Button
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
+          as={!user ? Link : "button"}
+          to="/login"
+          className="w-fit"
+        >
           Submit
         </Button>
       </Form>

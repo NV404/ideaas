@@ -1,18 +1,43 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { getIdeaas } from "utils/idea.server";
 import { getUser } from "utils/session.server";
+import Button from "~/components/Button";
+import Field from "~/components/Field";
 import IdeaCard from "~/components/IdeaCard";
 import Nav from "~/components/Nav";
+import Dropdown from "~/components/Dropdown";
+import { useState } from "react";
 
 export async function loader({ request }) {
   const user = await getUser(request);
-  const ideas = await getIdeaas();
+  const url = new URL(request.url);
+  const searchParams = url.searchParams;
+  const query = searchParams.get("sort");
+  var sort = query;
+  var ideas;
 
-  return { user, ideas };
+  if (query) {
+    ideas = await getIdeaas(sort);
+  } else {
+    sort = "relevant";
+    ideas = await getIdeaas(sort);
+  }
+
+  return { user, ideas, sort };
 }
 
 export default function Index() {
-  const { user, ideas } = useLoaderData();
+  const { user, ideas, sort } = useLoaderData();
+  const sortOption = [
+    {
+      value: "relevant",
+      label: "Relevant",
+    },
+    {
+      value: "latest",
+      label: "Latest",
+    },
+  ];
 
   return (
     <div className="flex gap-8 flex-col">
@@ -49,7 +74,17 @@ export default function Index() {
       </div>
 
       <div className="flex flex-col gap-4 items-center">
-        <p className="font-bold text-xl text-center">👇 Expolre 👇</p>
+        <div className="flex justify-between items-center w-full">
+          <p className="font-bold text-xl text-center">Explore</p>
+          <Field
+            as={Dropdown}
+            id="color"
+            name="color"
+            className="px-0 py-0 w-fit"
+            options={sortOption}
+            value={sort}
+          />
+        </div>
         {ideas.map((idea) => (
           <IdeaCard key={idea.id} idea={idea} />
         ))}

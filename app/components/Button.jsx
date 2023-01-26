@@ -6,6 +6,7 @@ const PADDINGS = {
 const THEMES = {
   none: "",
   monochrome: "bg-black text-neutral-100",
+  white: "bg-white",
   plain: "text-black underline hover:no-underline",
 };
 

@@ -9,13 +9,20 @@ export async function addIdeaa({ data }) {
   return idea;
 }
 
-export async function getIdeaas() {
+export async function getIdeaas(sort) {
   const ideas = await db.idea.findMany({
     include: {
       likes: true,
       discussion: true,
       user: true,
     },
+    ...(sort === "latest"
+      ? {
+          orderBy: {
+            createdAt: "desc",
+          },
+        }
+      : {}),
   });
   return ideas;
 }
@@ -31,6 +38,11 @@ export async function getIdeaById(id) {
         include: {
           user: true,
           likes: true,
+          subDiscussion: {
+            include: {
+              user: true,
+            },
+          },
         },
       },
       user: true,
@@ -118,6 +130,20 @@ export async function addDiscussion({ id, discussion, request }) {
     data: {
       discussion,
       ideaId: id,
+      userId,
+    },
+  });
+
+  return postDiscussion;
+}
+
+export async function addSubDiscussion({ id, discussion, request }) {
+  const userId = await getUserId(request);
+
+  const postDiscussion = await db.sub_discussion.create({
+    data: {
+      content: discussion,
+      discussionId: id,
       userId,
     },
   });

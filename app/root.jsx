@@ -5,9 +5,13 @@ const {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useTransition,
 } = require("@remix-run/react");
 import styles from "./styles/app.css";
-import { Analytics } from "@vercel/analytics/react";
+import NProgress from "nprogress";
+import nProgressStyles from "./styles/nprogress.css";
+import { useEffect } from "react";
+// import { Analytics } from "@vercel/analytics/react";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -28,10 +32,22 @@ export function links() {
       rel: "stylesheet",
       href: "https://api.fontshare.com/v2/css?f[]=archivo@1,2&f[]=clash-display@600&display=swap%22",
     },
+    { rel: "stylesheet", href: nProgressStyles },
   ];
 }
 
 export default function App() {
+  let transition = useTransition();
+
+  useEffect(() => {
+    NProgress.configure({ showSpinner: false });
+    if (transition.state !== "idle") {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [transition.state]);
+
   return (
     <html lang="en">
       <head>
@@ -42,7 +58,7 @@ export default function App() {
         <div className="w-[min(1080px,_100%)] h-full mx-auto pb-6 px-5">
           <Outlet />
         </div>
-        <Analytics />
+        {/* <Analytics /> */}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

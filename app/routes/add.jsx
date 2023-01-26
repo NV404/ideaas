@@ -1,5 +1,11 @@
 import { redirect } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useNavigate,
+} from "@remix-run/react";
 import { addIdeaa } from "utils/idea.server";
 import { getUser } from "utils/session.server";
 import Button from "~/components/Button";
@@ -43,12 +49,15 @@ export async function action({ request }) {
 
 export default function Add() {
   const user = useLoaderData().user;
+  const actionData = useActionData();
+  const navigate = useNavigate();
+  const goBack = () => navigate(-1);
 
   return (
     <div className="flex gap-8 flex-col">
       <Nav user={user} />
-      <Button as={Link} to="/" theme="plain" className="w-fit">
-        ← Home
+      <Button onClick={goBack} theme="plain" className="w-fit">
+        ← Back
       </Button>
       <Form method="post" className="flex flex-col gap-2">
         <Field
@@ -67,6 +76,9 @@ export default function Add() {
           label="Describe your idea (optional)"
           placeholder="Never gonna let you downn"
         />
+        {actionData?.error && (
+          <p className="text-red-600 font-medium">{data?.error}</p>
+        )}
         <Button className="w-fit">Submit</Button>
       </Form>
     </div>

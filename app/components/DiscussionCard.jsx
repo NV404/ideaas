@@ -1,7 +1,11 @@
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useTransition } from "@remix-run/react";
 import Button from "./Button";
+import Field from "./Field";
+import SubDiscussionCard from "./SubDiscussionCard";
 
 export default function DiscussionCard({ user, discussion }) {
+  const transition = useTransition();
+
   function isLiked(id) {
     const obj = discussion.likes.find((x) => x.userId === id);
     if (obj) {
@@ -26,7 +30,7 @@ export default function DiscussionCard({ user, discussion }) {
       </div>
       <p>{discussion.discussion}</p>
 
-      <Form method="post">
+      <Form method="post" replace>
         <input type="hidden" name="id" value={discussion?.id} />
         <input
           type="hidden"
@@ -37,6 +41,9 @@ export default function DiscussionCard({ user, discussion }) {
           as={!user ? Link : "button"}
           to="/login"
           theme="none"
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
           className={`flex justify-center items-center rounded-lg w-fit bg-blue-50 py-2 px-4 gap-2 cursor-pointer ${
             isLiked(user?.id)
               ? "hover:text-black  text-blue-500"
@@ -55,6 +62,35 @@ export default function DiscussionCard({ user, discussion }) {
           <p>{discussion.likes.length}</p>
         </Button>
       </Form>
+
+      <Form method="post" className="flex flex-col gap-2" replace>
+        <Field
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
+          as="textarea"
+          name="discussion"
+          id="discussion"
+          placeholder="Never gonna give youu uppp"
+          required
+        />
+        <input type="hidden" name="id" value={discussion?.id} />
+        <input type="hidden" name="action" value="sub_discussion" />
+        <Button
+          disabled={
+            transition.state === "loading" || transition.state === "submitting"
+          }
+          as={!user ? Link : "button"}
+          to="/login"
+          className="w-fit"
+        >
+          Submit
+        </Button>
+      </Form>
+
+      {discussion?.subDiscussion?.map((discussion) => (
+        <SubDiscussionCard key={discussion.id} subDiscussion={discussion} />
+      ))}
     </div>
   );
 }
